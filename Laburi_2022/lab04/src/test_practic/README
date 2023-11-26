@@ -1,0 +1,5 @@
+Am realizat un Makefile:
+- make: pentru a compila sursele
+- clean: stergere
+
+Exemplu rulare: java Test.java 5 5
