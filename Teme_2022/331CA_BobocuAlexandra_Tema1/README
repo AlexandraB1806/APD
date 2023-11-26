@@ -1,0 +1,81 @@
+Nume: Bobocu Alexandra-Florentina
+Grupa: 331CA
+                                                # TEMA 1 #
+                                    (Algoritmi Paraleli si Distribuiti)
+                                ~ Procesare paralela cu paradigma Map-Reduce ~
+
+# STRUCTURA ARHIVEI
+
+-> tema1.cpp;
+Fisierul principal. Extrag corespunzator datele inca de la citirea din linie de
+comanda si completez structura specifica unui thread. Creez corespunzator
+mutexul si bariera pe care le vor accesa threadurile. Voi da create la cele 2
+tipuri de threaduri in acelasi timp, ghidandu-ma dupa numarul maxim dintre
+numarul de threaduri de tip Mappers si numarul de threaduri de tip Reducers.
+Dupa ce s-au creat toate threadurile care erau mai putine ca numar (simultan
+cu threadurile care apar de numar maxim de ori), vor ramane sa se mai creeze
+restul threadurilor care erau mai multe. Analog, se procedeaza si la etapa de
+join. La finalul programului, distrug mutexul si bariera create.
+
+-> read_from_file.cpp;
+Fisier in care citesc continutul fisierelor puse la dispozitie. Am creat o
+functie care primeste ca parametru numele fisierului citit din linia de
+comanda si returneaza o coada in care am acces la caile catre fisierele "in"
+ce contin valorile numerice.
+
+-> mapper.cpp;
+Fisier in care implementez logica de la threadul de tip Mapper.
+
+-> reducer.cpp;
+Fisier in care implementez logica de la threadul de tip Reducer.
+
+-> helper.hpp;
+Fisier header unde se afla semnaturile functiilor si biblioteci utile.
+In plus, am creat o structura specifica unui thread, acesta avand acces la:
+- mutex;
+- bariera;
+- fisierele de procesat, retinute intr-o coada;
+- lista de map-uri partiale, rezultate in urma operatiei de Map, care vor
+contribui la crearea Map-ului final in etapa de Reduce;
+- numarul de Mapperi primit din linia de comanda;
+- numarul de Reduceri primit din linia de comanda.
+Punand elementele in structura, am evitat folosirea variabilelor globale.
+
+-> Makefile;
+Fisier in care includ regulile de build si clean.
+
+-> README.
+
+
+# LOGICA PROGRAMULUI
+
+Sincronizarea are loc in functiile de threaduri, asa cum se specifica in
+enuntul temei. Folosind bariera, ma voi asigura ca voi incepe operatiile de tip
+Reduce doar cand toate operatiile de tip Map s-au terminat.
+
+-> Mapper
+Pe masura ce parcurg coada de fisiere, folosesc mutex pentru a permite unui
+singur thread de tip Mapper sa intre in regiunea critica, adica ofer accesul
+doar unui thread la un moment dat sa isi aleaga fisierul pe care sa il
+proceseze. De asemenea, acel thread care a reusit sa intre in regiunea critica
+are responsabilitatea de a scoate fisierul respectiv din coada de fisiere,
+astfel ca urmatoarele threaduri vor avea posibilitatea sa acceseze fisierele
+ramase in coada, pana cand aceasta se goleste si nu mai este niciun fisier de
+procesat. Astfel, se asigura asignarea dinamica de documente, deoarece
+aflandu-ne intr-o bucla adevarata cat timp am fisiere in coada, daca un thread
+a reusit sa isi termine mai repede sarcina, iar in regiunea critica nu a intrat
+un alt thread, threadul mai rapid poate reveni sa isi aleaga un alt fisier pe
+care sa il proceseze.
+Voi popula mapa mappers_nums. Cheia reprezinta exponentul, iar valoarea este
+o lista de numere pentru care s-au gasit bazele corespunzatoare. In acest sens,
+parcurg exponentii posibili, rulez algoritmul de cautare binara si obtin
+numerele ce respecta conditia.
+Voi popula si lista de map-uri obtinute la fiecare pas. Folosesc mutex pentru a
+ma asigura ca nu adaug mai multe elemente in acelasi timp.
+
+-> Reducer
+Construiesc mapa rezultat reducers_nums in care am reuniunea tuturor mapelor
+partiale. Practic, pentru o anumita cheie, obtin reuniunea listelor ce au cheia
+respectiva, fara duplicate. Pentru eliminarea valorilor ce se repeta, voi
+folosi un set.
+Scriu in fisierele de tip "outX.txt" rezultatul.

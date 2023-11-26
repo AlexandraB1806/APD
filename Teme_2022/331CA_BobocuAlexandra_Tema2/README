@@ -1,0 +1,54 @@
+Nume: Bobocu Alexandra-Florentina
+Grupa: 331CA
+                                                # TEMA 2 #
+                                    (Algoritmi Paraleli si Distribuiti)
+                                           ~ Manager de comenzi ~
+
+# STRUCTURA ARHIVEI
+
+-> Tema2.java (fisierul principal);
+-> OrderThread.java (fisier in care am creat logica pentru threadurile ce se
+ocupa de gestionarea comenzilor);
+-> ProductThread.java (fisier in care am creat logica pentru threadurile ce se
+ocupa de gestionarea produselor);
+-> Makefile;
+Fisier in care includ regulile de build si clean.
+-> README.
+
+# LOGICA PROGRAMULUI
+
+* Tema2.java:
+
+Folosesc BufferedReader, respectiv BufferedWriter pentru a citi/a scrie
+din/in fisier.
+Voi crea o variabila de tip semafor ce accepta numThreads threaduri care
+gestioneaza produsele si voi crea cele 2 lock-uri pentru fiecare tip
+de thread pe care le trimit ca parametrii pentru ca acestea sa aiba mereu
+acces la ele.
+Din fisierul principal voi crea numThreads threaduri de nivel 1.
+Inchid corespunzator fisierele.
+
+
+* OrderThread.java:
+
+Citesc fisierul de comenzi intr-un loop infinit linie cu linie pana cand il
+termin. Pentru a ma asigura ca la un moment dat doar un singur thread citeste o
+anumita linie, folosesc lock (orderLock). Extrag informatia utila din linia
+citita. Doar daca am un numar nenul de produse voi crea din cadrul threadului
+de tip Order numProducts threaduri de nivel 2, adica de tipul Product. Avand un
+vector de numProducts threaduri , ma asigur ca fiecare astfel de thread se
+ocupa de produsul sau.
+Dupa ce toate threadurile de tipul Product au terminat de rulat, comanda
+procesata va fi considerata "shipped" si actualizez corespunzator
+fisierul de iesire, folosindu-ma tot de un lock.
+
+
+* ProductThread.java:
+
+Voi folosi un semafor pentru a permite doar numThreads threaduri de tip
+Product sa fie in executie.
+Similar ca in fisierul OrderThread.java, citesc fisierul cu id-ul comenzii si
+al produsului linie cu linie. Atat pentru scrierea, cat si pentru citirea din
+fisier, folosesc lock. Fiecare thread de tip Product isi cauta produsul de
+care este responsabil din comanda curenta. Imediat ce am gasit produsul din
+cadrul comenzii, marchez produsul respectiv ca fiind "shipped".

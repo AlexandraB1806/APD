@@ -1,0 +1,57 @@
+Nume: Bobocu Alexandra-Florentina
+Grupa: 331CA
+                                                # TEMA 3 #
+                                    (Algoritmi Paraleli si Distribuiti)
+                                ~ Calcule colaborative in sisteme distribuite ~
+
+# STRUCTURA ARHIVEI
+
+-> tema3.c (fisierul principal);
+-> Makefile (fisier in care includ regulile de build si clean);
+-> README.
+
+# LOGICA PROGRAMULUI
+
+1. Stabilirea topologiei in sistemul distribuit in toate procesele
+
+* Stochez topologia sub forma unei matrice cu 4 linii, corespunzator numarului
+de clustere. Pentru fiecare coordonator de cluster, retin ID-urile workerilor
+subordonati, pe care ii aflu din citirea fisierelor de de intrare, cu ajutorul
+functiei read_from_file(). In aceasta functie, voi retine ID-urile intr-un
+vector auxiliar id_worker_array[], urmand sa completez topologia corespunzator.
+Accesand topology[rank], unde rank = ID-ul coordonatorului de cluster, voi
+avea acces la vectorul de workeri subordonati respectivului coordonator.
+
+* In functia principala main, aloc spatiu corespunzator pentru structurile
+de date folosite, obtin rank-ul procesului si in functie de valoarea obtinuta,
+am un proces de tip coordonator sau worker. Intru pe ramura corespunzatoare
+si execut actiunile specifice fiecarui tip de proces, respectiv:
+
+- daca am un proces de tip coordonator, voi completa, citind din fisierele de
+tip cluster.txt, ID-urile workerilor subordonati.
+Dupa aceea, voi comunica coordonatorilor vecini topologia. Am ales sa trimit
+topologia in felul urmator: 0 -> 3 -> 2 -> 1. Astfel, in final, 1 va detine
+intreaga topologie, pe care o va trimite inapoi catre 0 astfel: 1 -> 2 -> 3 -> 0.
+Am folosit functiile specifice comunicarii intre coordonatori:
+send_data_to_coord() in cadrul careia afisez mesajul M si recv_data_from_coord().
+In cadrul acestor functii, trimit/primesc numarul de workeri, pentru a putea
+trimite/primi workerii specifici. In plus, in cadrul functiei in care primesc
+workerii, trebuie sa aloc in prealabil spatiu pentru acestia.
+Dupa ce coordonatorii au aflat topologia, o voi afisa din perspectiva fiecarui
+coordonator.
+In cele din urma, coordonatorul va trimite catre workerii sai informatiile
+despre topologie, cu ajutorul functiei send_data_from_coord_to_worker(),
+in cadrul careia afisez si mesajele de forma M. Tot in aceasta functie, le
+comunic workerilor coordonatorul, de cati workeri se ocupa acel coordonator
+si ID-urile workerilor subordonati.
+
+- daca am un proces de tip worker, voi primi informatiile despre topologie in
+momentul in care topologia este cunoscuta de toti coordonatorii. Folosesc in
+acest sens functia recv_data_from_coord_to_worker(). In cadrul acestei functii,
+workerul va afla mai intai cine este coordonatorul sau, dupa care va afla de
+cati workeri este responsabil coordonatorul respectiv si care sunt acei
+workeri.
+Dupa ce workerii au aflat topologia, o voi afisa din perspectiva fiecarui
+worker.
+
+La final, dezaloc memoria si inchei programul.
